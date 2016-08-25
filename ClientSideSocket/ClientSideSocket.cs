@@ -12,7 +12,6 @@ namespace ClientSideSocket
     {
         private string serverName;
         private int port;
-        private volatile bool stop;
 
         public ClientSideSocket(string serverName, int port)
         {
@@ -29,12 +28,17 @@ namespace ClientSideSocket
             StreamWriter writer = new StreamWriter(stream);
             StreamReader reader = new StreamReader(stream);
 
-            writer.WriteLine("Time?");
+            string message;
+            do
+            {
+            Console.Write("Write a message to the server: ");
+            message = Console.ReadLine();
+            writer.WriteLine(message);
             writer.Flush();
-
-            
+            Console.WriteLine("The message was send.");
             string serverText = reader.ReadLine();
             Console.WriteLine(serverText);
+            } while (message.ToLower() != "exit");
 
             Console.WriteLine("Shutting down connection...");
             writer.Close();

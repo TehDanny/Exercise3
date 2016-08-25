@@ -25,38 +25,40 @@ namespace ServerSideSocket
             TcpListener listener = new TcpListener(IP, port);
             listener.Start();
 
-            while (!stop)
-            { 
-                Console.Clear();
-                Console.WriteLine("Server is ready for a client to connect.");
+            Console.Clear();
+            Console.WriteLine("Server is ready for a client to connect.");
 
-                Socket clientSocket = listener.AcceptSocket();
+            Socket clientSocket = listener.AcceptSocket();
 
-                Console.WriteLine("A connection has been made.");
+            Console.WriteLine("A connection has been made.");
 
-                NetworkStream stream = new NetworkStream(clientSocket);
-                StreamWriter writer = new StreamWriter(stream);
-                StreamReader reader = new StreamReader(stream);
+            NetworkStream stream = new NetworkStream(clientSocket);
+            StreamWriter writer = new StreamWriter(stream);
+            StreamReader reader = new StreamReader(stream);
 
-                string clientText = reader.ReadLine();
+            string clientText;
+            do
+            {
+                clientText = reader.ReadLine();
                 Console.WriteLine("Client says: " + clientText);
 
                 if (clientText.ToLower() == "time?")
-                    writer.WriteLine(DateTime.Now.TimeOfDay);
+                    writer.WriteLine(DateTime.Now.ToLongTimeString());
+                else if (clientText.ToLower() == "date?")
+                    writer.WriteLine(DateTime.Now.ToLongDateString());
                 else
                     writer.WriteLine("Unknown command.");
-
                 writer.Flush();
+            } while (clientText.ToLower() != "exit");
 
-                Console.WriteLine("Shutting down connection...");
-                writer.Close();
-                reader.Close();
-                stream.Close();
-                clientSocket.Close();
+            Console.WriteLine("Shutting down connection...");
+            writer.Close();
+            reader.Close();
+            stream.Close();
+            clientSocket.Close();
 
-                Console.WriteLine("Press any key to continue");
-                Console.ReadKey();
-            }
+            Console.WriteLine("Press any key to continue");
+            Console.ReadKey();
         }
     }
 }
